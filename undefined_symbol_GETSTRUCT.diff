@@ -1,0 +1,15 @@
+Index: uint.c
+===================================================================
+--- uint.c	(revision 31903)
++++ uint.c	(working copy)
+@@ -8,6 +8,10 @@
+ #include "utils/lsyscache.h"
+ #include "catalog/pg_statistic.h"
+ 
++#if PG_VERSION_NUM >= 90300
++  #include "access/htup_details.h"
++#endif
++
+ #include <stdlib.h>
+ #include <limits.h>
+ 

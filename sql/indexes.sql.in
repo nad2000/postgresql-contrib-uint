@@ -1,0 +1,142 @@
+-- uint1, primary key.
+CREATE TABLE uint1_index_test (
+   col1 uint1 PRIMARY KEY
+) WITHOUT OIDS;
+
+-- Add data.
+INSERT INTO uint1_index_test VALUES
+   (1), (2), (3), (4), 
+   (10), (9), (8), (7),
+   (128), (0), (5), (133),
+   (192), (64), (255), (127);
+
+-- Verify data (normal order).
+SELECT col1
+FROM uint1_index_test
+ORDER BY col1;
+
+-- Verify data (reverse order).
+SELECT col1
+FROM uint1_index_test
+ORDER BY col1 DESC;
+
+-- Test collision
+INSERT INTO uint1_index_test VALUES (64);
+
+-- uint2, primary key.
+CREATE TABLE uint2_index_test (
+   col1 uint2 PRIMARY KEY
+) WITHOUT OIDS;
+
+INSERT INTO uint2_index_test VALUES
+   (1), (2), (3), (4), 
+   (65535), (65534), (65533), (65532),
+   (32768), (0), (32767), (127), 
+   (255), (128), (256), (40000);
+
+-- Verify data (normal order).
+SELECT col1
+FROM uint2_index_test
+ORDER BY col1;
+
+-- Verify data (reverse order).
+SELECT col1
+FROM uint2_index_test
+ORDER BY col1 DESC;
+
+-- Test collision
+INSERT INTO uint2_index_test VALUES (40000);
+
+
+-- uint4, primary key.
+CREATE TABLE uint4_index_test (
+   col1 uint4 PRIMARY KEY
+) WITHOUT OIDS;
+
+INSERT INTO uint4_index_test VALUES
+   (1), (2), (3), (4),
+   (4294967295), (4294967294), (4294967293), (4294967292),
+   (2147483647), (0), (255), (2147483648),
+   (254), (127), (256), (4000000000);
+
+-- Verify data (normal order).
+SELECT col1
+FROM uint4_index_test
+ORDER BY col1;
+
+-- Verify data (reverse order).
+SELECT col1
+FROM uint4_index_test
+ORDER BY col1 DESC;
+
+-- Test collision
+INSERT INTO uint4_index_test VALUES (4000000000);
+
+
+--
+-- Hash Indexes
+--
+CREATE TABLE hash_uint1_heap (seqno uint1 NOT NULL, random uint1 NOT NULL);
+CREATE INDEX hash_uint1_index ON hash_uint1_heap USING hash (random uint1_ops);
+COPY hash_uint1_heap FROM '@abs_builddir@/data/uint1_hash.data';
+
+SELECT *
+FROM   hash_uint1_heap
+WHERE  hash_uint1_heap.random = 236::uint1;
+
+SELECT * 
+FROM   hash_uint1_heap 
+WHERE  hash_uint1_heap.random = 241::uint1;
+
+UPDATE hash_uint1_heap
+SET    random = 79
+WHERE  hash_uint1_heap.random = 236::uint1;
+
+-- Make sure the row we replaced is empty.
+SELECT * 
+FROM   hash_uint1_heap 
+WHERE  hash_uint1_heap.random = 236::uint1;
+
+
+CREATE TABLE hash_uint2_heap (seqno uint2 NOT NULL, random uint2 NOT NULL);
+CREATE INDEX hash_uint2_index ON hash_uint2_heap USING hash (random uint2_ops);
+COPY hash_uint2_heap FROM '@abs_builddir@/data/uint2_hash.data';
+
+SELECT *
+FROM   hash_uint2_heap
+WHERE  hash_uint2_heap.random = 25050::uint2;
+
+SELECT * 
+FROM   hash_uint2_heap 
+WHERE  hash_uint2_heap.random = 57434::uint2;
+
+UPDATE hash_uint2_heap
+SET    random = 47893
+WHERE  hash_uint2_heap.random = 25050::uint2;
+
+-- Make sure the row we replaced is empty.
+SELECT * 
+FROM   hash_uint2_heap 
+WHERE  hash_uint2_heap.random = 25050::uint2;
+
+
+CREATE TABLE hash_uint4_heap (seqno uint4 NOT NULL, random uint4 NOT NULL);
+CREATE INDEX hash_uint4_index ON hash_uint4_heap USING hash (random uint4_ops);
+COPY hash_uint4_heap FROM '@abs_builddir@/data/uint4_hash.data';
+
+SELECT *
+FROM   hash_uint4_heap
+WHERE  hash_uint4_heap.random = 898880814::uint4;
+
+SELECT * 
+FROM   hash_uint4_heap 
+WHERE  hash_uint4_heap.random = 388457940::uint4;
+
+UPDATE hash_uint4_heap
+SET    random = 56610800
+WHERE  hash_uint4_heap.random = 898880814::uint4;
+
+-- Make sure the row we replaced is empty.
+SELECT * 
+FROM   hash_uint4_heap 
+WHERE  hash_uint4_heap.random = 898880814::uint4;
