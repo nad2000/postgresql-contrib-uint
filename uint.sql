@@ -1,6 +1,6 @@
 SET client_min_messages=ERROR;
 
-BEGIN WORK;
+-- BEGIN WORK;
 
 -- Adjust this setting to control where the objects get created.
 SET search_path = public;
@@ -965,4 +965,4 @@ CREATE CAST (int4 AS uint4) WITH FUNCTION int4touint4(int4) AS ASSIGNMENT;
 CREATE CAST (uint4 AS int8) WITH FUNCTION uint4toint8(uint4) AS IMPLICIT;
 CREATE CAST (int8 AS uint4) WITH FUNCTION int8touint4(int8) AS ASSIGNMENT;
 
-COMMIT;
+-- COMMIT;
