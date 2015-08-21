@@ -14,6 +14,7 @@
 
 #include <stdlib.h>
 #include <limits.h>
+#include <math.h>
 
 #define PG_GETARG_UINT8(n) DatumGetUInt8(PG_GETARG_DATUM(n))
 #define PG_RETURN_UINT8(x) return UInt8GetDatum(x)
@@ -348,7 +349,7 @@ uint1ge(PG_FUNCTION_ARGS)
 
 /**
  * This function implements the "equal" (=) operator between the int4
- * and uint1 data types.  
+ * and uint1 data types.
  *
  * This function is required to support hash joins for the uint1 data
  * type when the one argument is an int4 data type.
@@ -364,7 +365,7 @@ uint1ge(PG_FUNCTION_ARGS)
  * @param  arg2 The uint1 value.
  * @return The Datum containing the boolean operator value.
  *         The operator value is:
- *         true if arg1 == arg2 
+ *         true if arg1 == arg2
  *         false if arg1 != arg2
  */
 Datum
@@ -510,7 +511,7 @@ Datum
 hashuint1(PG_FUNCTION_ARGS)
 {
    uint8 arg1 = PG_GETARG_UINT8(0);
- 
+
    return hash_uint32((uint32) arg1);
 }
 
@@ -546,7 +547,7 @@ int4touint1(PG_FUNCTION_ARGS)
 
 /**
  * Cast a uint1 value into an int4 value.
- * 
+ *
  * @param  num The uint1 value.
  * @return     The Datum containing the int4 value.
  */
@@ -1437,7 +1438,7 @@ PG_FUNCTION_INFO_V1(int4uint4ge);
 
 /**
  * Internal function used by the int4uint4 operators.
- * 
+ *
  * It is NOT safe to directly subtract the values in this function because
  * the return value can overflow a signed 32-bit integer.
  *
@@ -2069,7 +2070,7 @@ uint_histogram_selectivity(VariableStatData *vardata, FmgrInfo *opproc,
             ltcmp = DatumGetBool(FunctionCall2(opproc, values[probe], constval));
             if(isgt)
                ltcmp = !ltcmp;
- 
+
             if(ltcmp)
                lobound = probe + 1;
             else
@@ -2164,7 +2165,7 @@ uintrestrictsel(VariableStatData *vardata, FmgrInfo opproc, Datum constval,
     */
    mcv_selec = mcv_selectivity(vardata, &opproc, constval, true, &sumcommon);
    hist_selec = uint_histogram_selectivity(vardata, &opproc, isgt, constval,
-                                           convert_value, convert_stats); 
+                                           convert_value, convert_stats);
 
    stats = (Form_pg_statistic) GETSTRUCT(vardata->statsTuple);
 
@@ -2251,12 +2252,12 @@ int4ltsel(PG_FUNCTION_ARGS)
    fmgr_info(get_opcode(operator), &opproc);
 
    selec = uintrestrictsel(&vardata, opproc, isgt, constval,
-                           &convert_uint4_to_double, 
+                           &convert_uint4_to_double,
                            &convert_int4_to_double);
 
    ReleaseVariableStats(vardata);
    PG_RETURN_FLOAT8((float8)selec);
-} 
+}
 
 Datum
 int4gtsel(PG_FUNCTION_ARGS)
