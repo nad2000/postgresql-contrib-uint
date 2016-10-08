@@ -10,11 +10,11 @@ This implementation of **uint** duplicates https://github.com/maciekgajewski/pos
 - made compatible with 9.x;
 - made compatible with >= 9.3.x;
 - added support for **CREATE EXTENSION**;
-- retested with PostgreSQL 9.5
+- retested with PostgreSQL 9.5 and 9.6
 
 ## Installation
 ```
-PATH=<path to your PostgreSQL bin>:$PATH; make && make install
+PATH=<path to your PostgreSQL bin with **pg_config**>:$PATH; make && make install
 ```
 
 ## Usage
