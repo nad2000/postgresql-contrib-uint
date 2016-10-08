@@ -18,3 +18,10 @@
 
 # QTCreator project
 *.user
+
+# Generated artefacts
+logfile
+sql/copy.sql
+sql/indexes.sql
+uint--*.sql
+
