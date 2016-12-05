@@ -5,8 +5,17 @@ machine:
         - docker
 
 test:
-        override:
+        pre:
         - docker build -t pg-uint .
+        - docker run --rm -d --name pguint pg-uint
+
+        override:
+        - docker exec pguint psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
+        - docker exec pguint psql -U postgres -c "CREATE TABLE test(col1 uint1, col2 uint2, col4 uint4);" && echo "SUCCESS"
+        - docker exec pguint psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 1000000) AS d(v)" && echo "SUCCESS"
+        - docker exec pguint psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 1000000) AS d(v)" && echo "SUCCESS"
+        post:
+        - docker stop pguint
 
 deployment:
         hub:
