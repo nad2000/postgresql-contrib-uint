@@ -16,7 +16,7 @@ script:
         - docker exec pguint psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
         - docker exec pguint psql -U postgres -c "CREATE TABLE test(col1 uint1, col2 uint2, col4 uint4);" && echo "SUCCESS"
         - docker exec pguint psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 1000000) AS d(v)" && echo "SUCCESS"
-        - docker exec pguint psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 1000000) AS d(v)" && echo "SUCCESS"
+        - docker exec pguint psql -U postgres -c "WITH t AS (SELECT DISTINCT col1 FROM test) SELECT count(*) FROM t" && echo "SUCCESS"
 
 after_success:
         - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
