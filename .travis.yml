@@ -10,7 +10,9 @@ before_install:
 
 install:
         - docker run -d --name pguint pg-uint
-        - sleep 10
+        # wait for the database to come up
+        - until docker exec pguint psql -U postgres -l; do
+                echo "Waiting for postgres container..."; sleep 0.5; done
 
 script:
         - docker exec pguint psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
