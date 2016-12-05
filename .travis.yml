@@ -20,9 +20,9 @@ script:
 
 after_success:
         - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
-        - docker tag pg-uint $DOCKER_HUB_USER_ID/postgres-uint:$CIRCLE_SHA1
+        - docker tag pg-uint $DOCKER_HUB_USER_ID/postgres-uint:$TRAVIS_COMMIT
         - docker tag pg-uint $DOCKER_HUB_USER_ID/postgres-uint:latest
-        - docker push $DOCKER_HUB_USER_ID/postgres-uint:$CIRCLE_SHA1
+        - docker push $DOCKER_HUB_USER_ID/postgres-uint:$TRAVIS_COMMIT
         - docker push $DOCKER_HUB_USER_ID/postgres-uint:latest
 
 after_script:
