@@ -6,7 +6,7 @@ machine:
 
 test:
         override:
-        - dokcer buld -t pg-uint .
+        - docker build -t pg-uint .
 
 deployment:
         hub:
