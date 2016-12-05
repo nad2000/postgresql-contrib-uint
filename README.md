@@ -1,4 +1,4 @@
-# postgresql-contrib-uint
+# postgresql-contrib-uint [![Build Status](https://travis-ci.org/nad2000/postgresql-contrib-uint.svg?branch=master)](https://travis-ci.org/nad2000/postgresql-contrib-uint)
 
 This implementation is a branch from http://pgfoundry.org/projects/uint/ by [Ryan Bradetich]( http://pgfoundry.org/users/rbrad/).
 It provides unsigned 2 byte and unsigned 4 byte data types to postgres 8.1 and greater.
