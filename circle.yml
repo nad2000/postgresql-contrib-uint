@@ -6,26 +6,20 @@ machine:
 
 test:
         pre:
-        - docker build -t pg-uint .
-        - docker run -d --name pguint pg-uint
+        - docker build -t IMAGE0 .
+        - docker export TMP | docker import - IMAGE
+        - docker rm -f TMP
+        - docker rmi -f IMAGE0
+        - docker run --name TEST -d IMAGE
+        # wait for the database to come up
+        - until docker exec TEST psql -U postgres -l; do echo "Waiting for postgres to start..."; sleep 0.5; done
 
         override:
         - docker exec pguint psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
         - docker exec pguint psql -U postgres -c "CREATE TABLE test(col1 uint1, col2 uint2, col4 uint4);" && echo "SUCCESS"
-        - docker exec pguint psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 1000000) AS d(v)" && echo "SUCCESS"
-        - docker exec pguint psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 1000000) AS d(v)" && echo "SUCCESS"
-
+        - docker exec pguint psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 100000) AS d(v)" && echo "SUCCESS"
+        - docker exec pguint psql -U postgres -c "WITH t AS (SELECT DISTINCT col1 FROM test) SELECT count(*) FROM t" && echo "SUCCESS"
         post:
-        - docker stop pguint
-        - docker rm -f pguint
-
-deployment:
-        hub:
-                branch: /.*/
-                commands:
-                        - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
-                        - docker tag pg-uint $DOCKER_HUB_USER_ID/postgres-uint:$CIRCLE_SHA1
-                        - docker tag pg-uint $DOCKER_HUB_USER_ID/postgres-uint:latest
-                        - docker push $DOCKER_HUB_USER_ID/postgres-uint:$CIRCLE_SHA1
-                        - docker push $DOCKER_HUB_USER_ID/postgres-uint:latest
+        - docker stop TEST
+        - docker rm -f TEST
 
