@@ -1,24 +1,25 @@
 machine:
         pre:
         - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
-        #services:
-        #- docker
+        services:
+        - docker
 
 test:
         pre:
-        - docker build -t IMAGE0 .
-        - docker export TMP | docker import - IMAGE
+        - docker build -t image0 .
+        - docker create --name TMP image0
+        - docker export TMP | docker import - image
         - docker rm -f TMP
-        - docker rmi -f IMAGE0
-        - docker run --name TEST -d IMAGE
+        - docker rmi -f image0
+        - docker run --name TEST -d image
         # wait for the database to come up
         - until docker exec TEST psql -U postgres -l; do echo "Waiting for postgres to start..."; sleep 0.5; done
 
         override:
-        - docker exec pguint psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
-        - docker exec pguint psql -U postgres -c "CREATE TABLE test(col1 uint1, col2 uint2, col4 uint4);" && echo "SUCCESS"
-        - docker exec pguint psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 100000) AS d(v)" && echo "SUCCESS"
-        - docker exec pguint psql -U postgres -c "WITH t AS (SELECT DISTINCT col1 FROM test) SELECT count(*) FROM t" && echo "SUCCESS"
+        - docker exec TEST psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
+        - docker exec TEST psql -U postgres -c "CREATE TABLE test(col1 uint1, col2 uint2, col4 uint4);" && echo "SUCCESS"
+        - docker exec TEST psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 100000) AS d(v)" && echo "SUCCESS"
+        - docker exec TEST psql -U postgres -c "WITH t AS (SELECT DISTINCT col1 FROM test) SELECT count(*) FROM t" && echo "SUCCESS"
         post:
         - docker stop TEST
         - docker rm -f TEST
