@@ -4,13 +4,9 @@ services:
         - docker
 
 before_install:
-        - docker build -t image0 .
+        - docker build -t image .
 
 install:
-        - docker create --name TMP image0
-        - docker export TMP | docker import - image
-        - docker rm -f TMP
-        - docker rmi -f image0
         - docker run --name TEST -d image
         # wait for the database to come up
         - until docker exec TEST psql -U postgres -l; do echo "Waiting for postgres to start..."; sleep 0.5; done

@@ -6,11 +6,7 @@ machine:
 
 test:
         pre:
-        - docker build -t image0 .
-        - docker create --name TMP image0
-        - docker export TMP | docker import - image
-        - docker rm -f TMP
-        - docker rmi -f image0
+        - docker build -t image .
         - docker run --name TEST -d image
         # wait for the database to come up
         - until docker exec TEST psql -U postgres -l; do echo "Waiting for postgres to start..."; sleep 0.5; done
@@ -23,4 +19,3 @@ test:
         post:
         - docker stop TEST
         - docker rm -f TEST
-
