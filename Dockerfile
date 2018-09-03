@@ -1,4 +1,4 @@
-FROM postgres:9
+FROM postgres:10.5
 COPY . /uint
 RUN apt-get update -y && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
