@@ -20,17 +20,20 @@
 #define PG_RETURN_UINT8(x) return UInt8GetDatum(x)
 #define PG_RETURN_UINT16(x) return UInt16GetDatum(x)
 
-#if defined(__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95))
-#   define likely(x) __builtin_expect((x),1)
-#   define unlikely(x) __builtin_expect((x),0)
-#else
-#   define likely(x) (x)
-#   define unlikely(x) (x)
+#if !defined(likely) && !defined(unlikely)
+#  if defined(__GNUC__) && (__GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ >= 95))
+#    define likely(x) __builtin_expect((x),1)
+#    define unlikely(x) __builtin_expect((x),0)
+#  else
+#    define likely(x) (x)
+#    define unlikely(x) (x)
+#  endif
 #endif
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
 #endif
+
 
 /*
  *  ==================
@@ -2029,8 +2032,12 @@ uint_histogram_selectivity(VariableStatData *vardata, FmgrInfo *opproc,
                            double (*convert_stats)(Datum))
 {
    double hist_selec;
+#if PG_VERSION_NUM < 100000
    Datum *values;
    int nvalues;
+#else
+   AttStatsSlot sslot;
+#endif
 
    hist_selec = 0.0;
 
@@ -2045,13 +2052,31 @@ uint_histogram_selectivity(VariableStatData *vardata, FmgrInfo *opproc,
     * the reverse way if isgt is TRUE.
     */
    if(HeapTupleIsValid(vardata->statsTuple) &&
+#if PG_VERSION_NUM < 90000
+      get_attstatsslot(vardata->statsTuple, vardata->atttype,
+                       vardata->atttypmod, STATISTIC_KIND_HISTOGRAM,
+                       InvalidOid,
+                       &values, &nvalues, NULL, NULL)
+#elif PG_VERSION_NUM < 100000
       get_attstatsslot(vardata->statsTuple, vardata->atttype,
                        vardata->atttypmod, STATISTIC_KIND_HISTOGRAM,
                        InvalidOid,
                        NULL,  /* Added for postgresql 9 compatibality */
-                       &values, &nvalues, NULL, NULL))
+                       &values, &nvalues, NULL, NULL)
+#else
+      get_attstatsslot(&sslot,
+		       vardata->statsTuple, vardata->atttype,
+                       vardata->atttypmod, STATISTIC_KIND_HISTOGRAM)
+                       /* InvalidOid, */
+                       /* &values, &nvalues, NULL, NULL) */
+#endif
+      )
    {
-      if(nvalues > 1) {
+      if(
+#if PG_VERSION_NUM >= 100000
+	 sslot.
+#endif
+	 nvalues > 1) {
          /*
           * Use binary search to find proper location, ie, the first slot
           * at which the comparison fails.  (If the given operator isn't
@@ -2061,13 +2086,21 @@ uint_histogram_selectivity(VariableStatData *vardata, FmgrInfo *opproc,
           */
          double histfrac;
          int lobound = 0;        /* first possible slot to search */
-         int hibound = nvalues;  /* last+1 slot to search */
+         int hibound = 
+#if PG_VERSION_NUM >= 100000
+		 sslot.
+#endif
+		 nvalues;  /* last+1 slot to search */
 
          while(lobound < hibound) {
             int probe = (lobound + hibound) / 2;
             bool ltcmp;
 
-            ltcmp = DatumGetBool(FunctionCall2(opproc, values[probe], constval));
+            ltcmp = DatumGetBool(FunctionCall2(opproc,
+#if PG_VERSION_NUM >= 100000
+                                                       sslot.
+#endif
+					               values[probe], constval));
             if(isgt)
                ltcmp = !ltcmp;
 
@@ -2077,7 +2110,11 @@ uint_histogram_selectivity(VariableStatData *vardata, FmgrInfo *opproc,
                hibound = probe;
          }
 
-         if(lobound >= nvalues) {
+         if(lobound >= 
+#if PG_VERSION_NUM >= 100000
+	 sslot.
+#endif
+	    nvalues) {
             /* Constant is above upper histogram boundary. */
             histfrac = 1.0;
          }
@@ -2096,8 +2133,16 @@ uint_histogram_selectivity(VariableStatData *vardata, FmgrInfo *opproc,
              */
 
             val = (*convert_value)(constval);
-            low = (*convert_stats)(values[i - 1]);
-            high = (*convert_stats)(values[i]);
+            low = (*convert_stats)(
+#if PG_VERSION_NUM >= 100000
+	                           sslot.
+#endif
+				   values[i - 1]);
+            high = (*convert_stats)(
+#if PG_VERSION_NUM >= 100000
+	                            sslot.
+#endif
+				    values[i]);
 
             if(high <= low)
                binfrac = 0.5; /* cope if bin boundaries appear identical */
@@ -2124,7 +2169,11 @@ uint_histogram_selectivity(VariableStatData *vardata, FmgrInfo *opproc,
              * binfrac partial bin below the constant.
              */
             histfrac = (double) (i - 1) + binfrac;
-            histfrac /= (double) (nvalues - 1);
+            histfrac /= (double) (
+#if PG_VERSION_NUM >= 100000
+	 sslot.
+#endif
+				  nvalues - 1);
          }
 
          /*
@@ -2145,7 +2194,11 @@ uint_histogram_selectivity(VariableStatData *vardata, FmgrInfo *opproc,
          else if (hist_selec > 0.9999)
             hist_selec = 0.9999;
       }
+#if PG_VERSION_NUM < 100000
       free_attstatsslot(vardata->atttype, values, nvalues, NULL, 0);
+#else
+      free_attstatsslot(&sslot);
+#endif
    }
    return hist_selec;
 }
