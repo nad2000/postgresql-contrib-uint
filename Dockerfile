@@ -1,3 +1,4 @@
+ARG PG_VERSION
 FROM postgres:${PG_VERSION:-9}
 COPY . /uint
 RUN apt-get update -y && apt-get upgrade -y \
