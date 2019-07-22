@@ -2067,8 +2067,6 @@ uint_histogram_selectivity(VariableStatData *vardata, FmgrInfo *opproc,
       get_attstatsslot(&sslot,
 		       vardata->statsTuple, vardata->atttype,
                        vardata->atttypmod, STATISTIC_KIND_HISTOGRAM)
-                       /* InvalidOid, */
-                       /* &values, &nvalues, NULL, NULL) */
 #endif
       )
    {

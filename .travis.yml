@@ -1,10 +1,16 @@
 sudo: required
 
+matrix:
+        - evn: PG_VERSION=9
+        - evn: PG_VERSION=10
+        - evn: PG_VERSION=11
+        - evn: PG_VERSION=12
+
 services:
         - docker
 
 before_install:
-        - docker build -t image .
+        - docker build --build-arg PG_VERSION=${PG_VERSION} -t image .
 
 install:
         - docker run --name TEST -d image
@@ -19,9 +25,9 @@ script:
 
 after_success:
         - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
-        - docker tag image $DOCKER_HUB_USER_ID/postgres-uint:$TRAVIS_COMMIT
+        - docker tag image $DOCKER_HUB_USER_ID/postgres-uint:${PG_VERSION}_$TRAVIS_COMMIT
         - docker tag image $DOCKER_HUB_USER_ID/postgres-uint:latest
-        - docker push $DOCKER_HUB_USER_ID/postgres-uint:$TRAVIS_COMMIT
+        - docker push $DOCKER_HUB_USER_ID/postgres-uint:${PG_VERSION}_$TRAVIS_COMMIT
         - docker push $DOCKER_HUB_USER_ID/postgres-uint:latest
 
 after_script:
