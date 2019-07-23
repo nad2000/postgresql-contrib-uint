@@ -2,9 +2,9 @@ sudo: required
 matrix:
         include:
                 - env: PG_VERSION=9
-                - env: PG_VERSION=10
-                - env: PG_VERSION=11
-                - env: PG_VERSION=12
+                # - env: PG_VERSION=10
+                # - env: PG_VERSION=11
+                # - env: PG_VERSION=12
 
 services:
         - docker
@@ -20,7 +20,7 @@ install:
 script:
         - docker exec TEST psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
         - docker exec TEST psql -U postgres -c "CREATE TABLE test(col1 uint1, col2 uint2, col4 uint4);" && echo "SUCCESS"
-        - docker exec TEST psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 100000) AS d(v)" && echo "SUCCESS"
+        - docker exec TEST psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 100000, 42) AS d(v)" && echo "SUCCESS"
         - docker exec TEST psql -U postgres -c "WITH t AS (SELECT DISTINCT col1 FROM test) SELECT count(*) FROM t" && echo "SUCCESS"
 
 after_success:
