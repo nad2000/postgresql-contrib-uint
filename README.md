@@ -7,12 +7,13 @@ This implementation of **uint** duplicates https://github.com/maciekgajewski/pos
 
 ## Major changes made so far
 
-- made compatible with 9.x;
-- made compatible with >= 9.3.x;
-- added support for **CREATE EXTENSION**;
-- retested with PostgreSQL 9.5 and 9.6
-- dockerized;
+- *2019-08-03*: made compatible with 9.x, 10.x, and 11.x;
 - added automated testing and CI (travisCI).
+- dockerized;
+- retested with PostgreSQL 9.5 and 9.6
+- added support for **CREATE EXTENSION**;
+- made compatible with >= 9.3.x;
+- made compatible with 9.x;
 
 ## Installation
 ```
