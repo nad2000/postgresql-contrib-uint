@@ -19,11 +19,12 @@ install:
 
 script:
   - docker exec TEST psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
-  - docker exec TEST psql -U postgres -c "CREATE TABLE IF NOT EXISTS test ( \
-      col1 uint1, col2 uint2, col4 uint4); \
-      INSERT INTO test(col1, col2, col4) \
-      SELECT v % 127, v % 16256, v \
-      FROM generate_series(1, 100000, 42) AS d(v); \
+  - >-
+    docker exec TEST psql -U postgres -c "CREATE TABLE IF NOT EXISTS test (
+      col1 uint1, col2 uint2, col4 uint4); 
+      INSERT INTO test(col1, col2, col4) 
+      SELECT v % 127, v % 16256, v 
+      FROM generate_series(1, 100000, 42) AS d(v); 
       WITH t AS (SELECT DISTINCT col1 FROM test) SELECT count(*) FROM t;" && echo "SUCCESS"
   - docker logs TEST
 
