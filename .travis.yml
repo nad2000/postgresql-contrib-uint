@@ -29,11 +29,14 @@ script:
   - docker logs TEST
 
 after_success:
-  - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
-  - docker tag image $DOCKER_HUB_USER_ID/postgres-uint:${PG_VERSION}_$TRAVIS_COMMIT
-  - docker tag image $DOCKER_HUB_USER_ID/postgres-uint:latest
-  - docker push $DOCKER_HUB_USER_ID/postgres-uint:${PG_VERSION}_$TRAVIS_COMMIT
-  - docker push $DOCKER_HUB_USER_ID/postgres-uint:latest
+  - docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+  - docker tag image $DOCKER_HUB_USER_ID/postgres-uint:v$PG_VERSION
+  - docker push $DOCKER_HUB_USER_ID/postgres-uint:v$PG_VERSION
+  - >
+    if [ $PG_VERSION == 11 ] ; then
+      docker tag image $DOCKER_HUB_USER_ID/postgres-uint:latest
+      docker push $DOCKER_HUB_USER_ID/postgres-uint:latest
+    fi
 
 after_script:
   - docker stop TEST
