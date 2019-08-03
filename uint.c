@@ -217,6 +217,7 @@ PG_FUNCTION_INFO_V1(uint1le);
 PG_FUNCTION_INFO_V1(uint1gt);
 PG_FUNCTION_INFO_V1(uint1ge);
 PG_FUNCTION_INFO_V1(uint1int4eq);
+PG_FUNCTION_INFO_V1(int4uint1eq);
 
 /**
  * This function implements the "equal" (=) operator for the uint1 datatype.
@@ -746,6 +747,7 @@ PG_FUNCTION_INFO_V1(uint2le);
 PG_FUNCTION_INFO_V1(uint2gt);
 PG_FUNCTION_INFO_V1(uint2ge);
 PG_FUNCTION_INFO_V1(uint2int4eq);
+PG_FUNCTION_INFO_V1(int4uint2eq);
 
 /**
  * This function implements the "equal" (=) operator for the uint2 datatype.

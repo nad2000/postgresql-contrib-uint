@@ -2,7 +2,7 @@ sudo: required
 matrix:
   include:
     - env: PG_VERSION=9
-    # - env: PG_VERSION=10
+    - env: PG_VERSION=10
     # - env: PG_VERSION=11
     # - env: PG_VERSION=12
 
