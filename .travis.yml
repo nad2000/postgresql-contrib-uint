@@ -1,30 +1,43 @@
 sudo: required
+matrix:
+  include:
+    - env: PG_VERSION=9
+    - env: PG_VERSION=10
+    - env: PG_VERSION=11
+    # - env: PG_VERSION=12
 
 services:
-        - docker
+  - docker
 
 before_install:
-        - docker build -t image .
+  - docker build --build-arg PG_VERSION=${PG_VERSION} -t image .
 
 install:
-        - docker run --name TEST -d image
-        # wait for the database to come up
-        - until docker exec TEST psql -U postgres -l; do echo "Waiting for postgres to start..."; sleep 0.5; done
+  - docker run --name TEST -d image
+  # wait for the database to come up
+  - until docker exec TEST psql -U postgres -l; do echo "Waiting for postgres to start..."; sleep 0.5; done
 
 script:
-        - docker exec TEST psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
-        - docker exec TEST psql -U postgres -c "CREATE TABLE test(col1 uint1, col2 uint2, col4 uint4);" && echo "SUCCESS"
-        - docker exec TEST psql -U postgres -c "INSERT INTO test(col1, col2, col4) SELECT v % 127, v % 16256, v FROM generate_series(1, 100000) AS d(v)" && echo "SUCCESS"
-        - docker exec TEST psql -U postgres -c "WITH t AS (SELECT DISTINCT col1 FROM test) SELECT count(*) FROM t" && echo "SUCCESS"
+  - docker exec TEST psql -U postgres -c "CREATE EXTENSION uint" && echo "SUCCESS"
+  - >-
+    docker exec TEST psql -U postgres -c "CREATE TABLE IF NOT EXISTS test (
+      col1 uint1, col2 uint2, col4 uint4); 
+      INSERT INTO test(col1, col2, col4) 
+      SELECT v % 127, v % 16256, v 
+      FROM generate_series(1, 100000, 42) AS d(v); 
+      WITH t AS (SELECT DISTINCT col1 FROM test) SELECT count(*) FROM t;" && echo "SUCCESS"
+  - docker logs TEST
 
 after_success:
-        - docker login -e $DOCKER_HUB_EMAIL -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
-        - docker tag image $DOCKER_HUB_USER_ID/postgres-uint:$TRAVIS_COMMIT
-        - docker tag image $DOCKER_HUB_USER_ID/postgres-uint:latest
-        - docker push $DOCKER_HUB_USER_ID/postgres-uint:$TRAVIS_COMMIT
-        - docker push $DOCKER_HUB_USER_ID/postgres-uint:latest
+  - docker login -u $DOCKER_HUB_USER_ID -p $DOCKER_HUB_PWD
+  - docker tag image $DOCKER_HUB_USER_ID/postgres-uint:v$PG_VERSION
+  - docker push $DOCKER_HUB_USER_ID/postgres-uint:v$PG_VERSION
+  - >
+    if [ $PG_VERSION == 11 ] ; then
+      docker tag image $DOCKER_HUB_USER_ID/postgres-uint:latest
+      docker push $DOCKER_HUB_USER_ID/postgres-uint:latest
+    fi
 
 after_script:
-        - docker stop TEST
-        - docker rm -f TEST
-
+  - docker stop TEST
+  - docker rm -f TEST
