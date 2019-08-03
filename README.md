@@ -8,8 +8,8 @@ This implementation of **uint** duplicates https://github.com/maciekgajewski/pos
 ## Major changes made so far
 
 - *2019-08-03*: made compatible with 9.x, 10.x, and 11.x;
-- added automated testing and CI (travisCI).
-- dockerized;
+- added automated testing and CI (*TravisCI*): https://travis-ci.org/nad2000/postgresql-contrib-uint.
+- dockerized and published at https://cloud.docker.com/u/nad2000/repository/docker/nad2000/postgres-uint;
 - retested with PostgreSQL 9.5 and 9.6
 - added support for **CREATE EXTENSION**;
 - made compatible with >= 9.3.x;
