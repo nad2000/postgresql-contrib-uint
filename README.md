@@ -3,11 +3,11 @@
 This implementation is a branch from http://pgfoundry.org/projects/uint/ by [Ryan Bradetich]( http://pgfoundry.org/users/rbrad/).
 It provides unsigned 2 byte and unsigned 4 byte data types to postgres 8.1 and greater.
 
-This implementation of **uint** duplicates https://github.com/maciekgajewski/postgres-uints in a way. But atop of that this implementation provides also **uint1**.
+This implementation of **uint** is in a way similar to  https://github.com/maciekgajewski/postgres-uints. But atop of that this implementation provides also **uint1**.
 
 ## Major changes made so far
 
-- *2019-08-03*: made compatible with 9.x, 10.x, and 11.x;
+- *2020-03-08*: made compatible with 9.x, 10.x, 11.x, 12.x;
 - added automated testing and CI (*TravisCI*): https://travis-ci.org/nad2000/postgresql-contrib-uint.
 - dockerized and published at https://cloud.docker.com/u/nad2000/repository/docker/nad2000/postgres-uint;
 - retested with PostgreSQL 9.5 and 9.6

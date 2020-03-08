@@ -4,7 +4,7 @@ matrix:
     - env: PG_VERSION=9
     - env: PG_VERSION=10
     - env: PG_VERSION=11
-    # - env: PG_VERSION=12
+    - env: PG_VERSION=12
 
 services:
   - docker
@@ -13,7 +13,7 @@ before_install:
   - docker build --build-arg PG_VERSION=${PG_VERSION} -t image .
 
 install:
-  - docker run --name TEST -d image
+  - docker run --name TEST -e POSTGRES_PASSWORD=p455w0rd -d image
   # wait for the database to come up
   - until docker exec TEST psql -U postgres -l; do echo "Waiting for postgres to start..."; sleep 0.5; done
 
