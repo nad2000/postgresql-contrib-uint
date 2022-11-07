@@ -1,7 +1,7 @@
+#include "postgres.h"
 #include "access/hash.h"
 #include "fmgr.h"
 #include "libpq/pqformat.h"
-#include "postgres.h"
 
 #include "catalog/pg_statistic.h"
 #include "utils/lsyscache.h"
