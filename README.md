@@ -7,6 +7,7 @@ This implementation of **uint** is in a way similar to  https://github.com/macie
 
 ## Major changes made so far
 
+- *2022-11-07*: made compatible with 13.x, 14.x, 15.x;
 - *2020-03-08*: made compatible with 9.x, 10.x, 11.x, 12.x;
 - added automated testing and CI (*TravisCI*): https://travis-ci.org/nad2000/postgresql-contrib-uint.
 - dockerized and published at https://cloud.docker.com/u/nad2000/repository/docker/nad2000/postgres-uint;
