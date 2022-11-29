@@ -4,45 +4,58 @@
 # then please put 'unknown'.
 
 # Maintainer: Radomirs Cirskis <nad2000@gmail.com>
-pkgname=postgresql-uint
-pkgver=3.0.0
+_pkgname=postgresql-uint
+pkgname=$_pkgname-git
+pkgver=master.v3.0.0.r2.876bcea
 pkgrel=1
-epoch=
+_pgversion=14
+# epoch=
 pkgdesc="PostgreSQL unsigned integer type extension"
 arch=('x86_64')
 url="https://github.com/nad2000/postgresql-contrib-uint"
-license=('GPL')
+license=('BSD')
 groups=()
-depends=()
-makedepends=('postgresql')
+depends=("postgresql${_pgversion}-libs")
+makedepends=('git')
 checkdepends=()
 optdepends=()
-provides=()
-conflicts=()
+conflicts=("$_pkgname")
+provides=("${_pkgname}=${pkgver}")
+_reponame=postgresql-contrib-uint
+_owner="nad2000"
+_branch="master"
+source=("git+https://github.com/$_owner/$_reponame.git#branch=$_branch")
+md5sums=('SKIP')
+sha256sums=('SKIP')
 replaces=()
 backup=()
 options=()
 install=
 changelog=
-source=("$pkgname-$pkgver.tar.gz"
-        "$pkgname-$pkgver.patch")
 noextract=()
 md5sums=()
 validpgpkeys=()
 
+pkgver() {
+	cd "$_reponame"
+	printf "%s.%s" "$(echo $_branch | sed 's/-/_/g')" "$(git describe --long --tags | sed 's/\([^-]*-\)g/r\1/;s/-/./g')"
+}
+
 prepare() {
-	cd "$pkgname-$pkgver"
-	patch -p1 -i "$srcdir/$pkgname-$pkgver.patch"
+	# cd "$pkgname-$pkgver"
+	# patch -p1 -i "$srcdir/$pkgname-$pkgver.patch"
+	cd "$_reponame"
 }
 
 build() {
-	cd "$pkgname-$pkgver"
-	./configure --prefix=/usr
+	# cd "$pkgname-$pkgver"
+	cd "$_reponame"
 	make
 }
 
 check() {
-	cd "$pkgname-$pkgver"
+	# cd "$pkgname-$pkgver"
+	cd "$_reponame"
 	make -k check
 }
 
