@@ -6,7 +6,7 @@
 # Maintainer: Radomirs Cirskis <nad2000@gmail.com>
 _pkgname=postgresql-uint
 pkgname=$_pkgname-git
-pkgver=master.v3.0.0.r2.876bcea
+pkgver=master.v3.0.0.r3.6cd755c
 pkgrel=1
 _pgversion=14
 # epoch=
@@ -60,7 +60,8 @@ check() {
 }
 
 package() {
-	cd "$pkgname-$pkgver"
+	# cd "$pkgname-$pkgver"
+	cd "$_reponame"
 	make DESTDIR="$pkgdir/" install
 }
 
