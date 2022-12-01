@@ -1,5 +1,5 @@
 comment = 'Unsigned integer types for PostgreSQL'
-default_version = '1.15'
+default_version = '3.1'
 module_pathname = '$libdir/uint'
 relocatable = true
 
