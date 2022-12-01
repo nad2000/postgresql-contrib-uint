@@ -6,7 +6,7 @@
 # Maintainer: Radomirs Cirskis <nad2000@gmail.com>
 _pkgname=postgresql-uint
 pkgname=$_pkgname-git
-pkgver=3.1
+pkgver=master.v3.1.0.r0.19de2b9
 pkgrel=1
 _pgversion=14
 # epoch=
@@ -15,7 +15,8 @@ arch=('x86_64')
 url="https://github.com/nad2000/postgresql-contrib-uint"
 license=('BSD')
 groups=()
-depends=("postgresql${_pgversion}-libs")
+# depends=("postgresql-libs")
+depends=("glibc")
 makedepends=('git')
 checkdepends=()
 optdepends=()
