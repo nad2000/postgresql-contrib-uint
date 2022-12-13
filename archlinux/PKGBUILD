@@ -6,14 +6,14 @@
 # Maintainer: Radomirs Cirskis <nad2000@gmail.com>
 _pkgname=postgresql-uint
 pkgname=$_pkgname-git
-pkgver=master.v3.1.0.r0.19de2b9
+pkgver=master.v3.1.0.r2.572cab7
 pkgrel=1
 _pgversion=14
 # epoch=
 pkgdesc="PostgreSQL unsigned integer type extension"
 arch=('x86_64')
 url="https://github.com/nad2000/postgresql-contrib-uint"
-license=('BSD')
+license=('MIT')
 groups=()
 # depends=("postgresql-libs")
 depends=("glibc")
@@ -25,8 +25,9 @@ provides=("${_pkgname}=${pkgver}")
 _reponame=postgresql-contrib-uint
 _owner="nad2000"
 _branch="master"
-source=("git+https://github.com/$_owner/$_reponame.git#branch=$_branch")
-md5sums=('SKIP')
+_commit="572cab77fb85cdd04a376d28e61283ebaea16392"
+source=("git+https://github.com/$_owner/$_reponame.git#commit=$_commit")
+# md5sums=('SKIP')
 sha256sums=('SKIP')
 replaces=()
 backup=()
@@ -34,7 +35,6 @@ options=()
 install=
 changelog=
 noextract=()
-md5sums=()
 validpgpkeys=()
 
 pkgver() {
@@ -64,6 +64,7 @@ package() {
 	# cd "$pkgname-$pkgver"
 	cd "$_reponame"
 	make DESTDIR="$pkgdir/" install
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }
 
 # vim: ts=2 sw=2 et:
